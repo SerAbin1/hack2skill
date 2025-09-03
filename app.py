@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import PyPDF2
 import docx
@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # ---------- Load categorized skills ----------
@@ -62,23 +62,29 @@ def index():
         uploaded_file = request.files.get("resume_file")
         if uploaded_file and uploaded_file.filename != "":
             if allowed_file(uploaded_file.filename):
-                filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+                filename = uploaded_file.filename
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 uploaded_file.save(filepath)
 
                 # Extract text
-                if filepath.endswith(".pdf"):
+                if filename.endswith(".pdf"):
                     resume_text = extract_text_from_pdf(filepath)
-                elif filepath.endswith(".docx"):
+                elif filename.endswith(".docx"):
                     resume_text = extract_text_from_docx(filepath)
             else:
-                return "Unsupported file type. Please upload PDF or DOCX.", 400
+                return jsonify({"error": "Unsupported file type. Please upload PDF or DOCX."}), 400
 
         detected_skills = extract_skills(resume_text, manual_skills)
         return jsonify({"skills": detected_skills})
 
-    return render_template("skills.html")
+    return render_template("index.html")
 
-# Route to get categories for dropdown
+# Route to get skills JSON
+@app.route("/skills.json")
+def skills_json():
+    return send_from_directory('.', 'skills.json')
+
+# Route to get categories (optional)
 @app.route("/get_categories")
 def get_categories():
     return jsonify(SKILLS_CATEGORIES)

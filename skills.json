@@ -1,8 +1,24 @@
 {
   "Tech Skills": [
-    "python", "javascript", "sql", "html", "css", "react", "flask", "docker", "aws"
+    "python", "javascript", "sql", "html", "css", "react", "flask", "docker", "aws", "node.js",
+    "angular", "vue.js", "java", "c++", "c#", "go", "rust", "swift", "kubernetes", "terraform",
+    "tensorflow", "pytorch", "pandas", "numpy", "mongodb", "mysql", "postgresql", "redis", "sqlite"
   ],
   "Life Skills": [
-    "communication", "teamwork", "leadership", "problem-solving", "critical thinking", "adaptability", "time management"
+    "communication", "teamwork", "leadership", "problem-solving", "critical thinking", "adaptability",
+    "time management", "creativity", "negotiation", "decision making", "emotional intelligence", "resilience"
+  ],
+  "Business Skills": [
+    "project management", "marketing", "sales", "finance", "analytics", "strategy", "business development"
+  ],
+  "Cloud & DevOps": [
+    "aws", "azure", "google cloud", "docker", "kubernetes", "jenkins", "git", "ci/cd", "ansible"
+  ],
+  "Data Science & AI": [
+    "machine learning", "deep learning", "nlp", "data analysis", "data visualization", "r", "matlab",
+    "scikit-learn", "keras"
+  ],
+  "Design & UX": [
+    "photoshop", "illustrator", "figma", "adobe xd", "ui/ux design", "wireframing", "prototyping"
   ]
 }
