@@ -3,76 +3,50 @@ import "./LandingPage.css";
 
 const LandingPage = () => {
   return (
-    <div>
-      {/* NAVBAR */}
-      <header className="navbar">
-        <div className="logo">
-          Career<span>Compass</span>
-        </div>
-        <nav className="nav-links">
-          <a href="#">AI Resume Builder</a>
-          <a href="#">Features</a>
-          <a href="#">Services</a>
-          <a href="#">Resources</a>
-        </nav>
-        <div className="nav-buttons">
-          <button className="btn btn-login">LOG IN</button>
-          <button className="btn btn-signup">SIGN UP</button>
-        </div>
-      </header>
+    <div className="landing-container">
+      {/* TOP NAVIGATION */}
+      <div className="top-nav">
+        <button className="nav-btn">LOG IN</button>
+      
+      </div>
 
-      {/* HERO SECTION */}
-      <section className="hero">
-        <h4>TRUSTED BY OVER 500K JOB SEEKERS!</h4>
+      {/* LOGO / TITLE */}
+      <div className="logo-box">
         <h1>
-          Land your <span>d job</span>. <br /> Withe stress.
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>C</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>a</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>r</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>e</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>e</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>r</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>C</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>o</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>m</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>p</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>a</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>s</span>
+          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>s</span>
         </h1>
+        <p>Your AI Career Companion</p>
+      </div>
+
+      {/* BUTTON GRID */}
+      <div className="button-grid">
+        <button className="menu-btn">AI Resume Builder</button>
+        <button className="menu-btn">Features</button>
+        <button className="menu-btn">Services</button>
+        <button className="menu-btn">Resources</button>
+      </div>
+
+      {/* HERO TEXT */}
+      <div className="hero-text">
+        <h2>Your AI Career Compass</h2>
         <p>
           AI Resume Builder • Automated Job Tracking • Optimize your LinkedIn
           Profile • And Much More...
         </p>
         <button className="btn-primary">SIGN UP FOR FREE</button>
-
-        <div className="features">
-          <div className="feature">
-            <div className="feature-dot"></div> AI Resume Builder
-          </div>
-          <div className="feature">
-            <div className="feature-dot"></div> Automated Job Tracking
-          </div>
-          <div className="feature">
-            <div className="feature-dot"></div> Optimize your LinkedIn
-          </div>
-          <div className="feature">
-            <div className="feature-dot"></div> And Much More...
-          </div>
-        </div>
-
-        <div className="social-proof">
-          <div className="avatars">
-            <img
-              src="https://randomuser.me/api/portraits/men/32.jpg"
-              alt="user1"
-            />
-            <img
-              src="https://randomuser.me/api/portraits/women/44.jpg"
-              alt="user2"
-            />
-            <img
-              src="https://randomuser.me/api/portraits/men/51.jpg"
-              alt="user3"
-            />
-            <img
-              src="https://randomuser.me/api/portraits/men/60.jpg"
-              alt="user4"
-            />
-          </div>
-          <p>
-            "I got recruiters from Amazon, Wise, and other companies reaching
-            out already!"
-          </p>
-        </div>
-      </section>
+      </div>
     </div>
   );
 };
