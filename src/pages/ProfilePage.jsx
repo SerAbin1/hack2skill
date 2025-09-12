@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import RoadmapFlow from "../components/RoadmapFlow";
@@ -11,6 +11,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [roadmapData, setRoadmapData] = useState(null);
   const [roadmapLoading, setRoadmapLoading] = useState(false);
+  const [showRoadmapModal, setShowRoadmapModal] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -51,6 +52,7 @@ const ProfilePage = () => {
 
       if (docSnap.exists()) {
         setRoadmapData(docSnap.data());
+        setShowRoadmapModal(true);
       } else {
         alert("No roadmap found. Please contact support.");
       }
@@ -59,6 +61,29 @@ const ProfilePage = () => {
       alert("Failed to fetch roadmap. Please try again.");
     } finally {
       setRoadmapLoading(false);
+    }
+  };
+
+  const handleCloseRoadmap = () => {
+    setShowRoadmapModal(false);
+  };
+
+  const handleClearData = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDocRef = doc(db, "users", user.uid);
+      const roadmapDocRef = doc(db, "roadmaps", user.uid);
+
+      try {
+        await deleteDoc(userDocRef);
+        await deleteDoc(roadmapDocRef);
+        setProfileData(null);
+        setRoadmapData(null);
+        alert("All data cleared successfully!");
+      } catch (error) {
+        console.error("Error clearing data:", error);
+        alert("Failed to clear data. Please try again.");
+      }
     }
   };
 
@@ -96,12 +121,23 @@ const ProfilePage = () => {
           >
             {roadmapLoading ? "Loading Roadmap..." : "Show My Learning Roadmap"}
           </button>
+          <button
+            onClick={handleClearData}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            Clear All Data
+          </button>
         </div>
       </div>
-      {roadmapData && (
-        <div className="mt-8 bg-white shadow-xl rounded-2xl p-6 w-full max-w-3xl border border-gray-200">
-          <h2 className="text-xl font-bold mb-4">Generated Roadmap</h2>
-          <RoadmapFlow roadmapData={roadmapData} />
+      {showRoadmapModal && roadmapData && (
+        <div className="fixed inset-0 bg-black/5 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-3xl border border-gray-200 relative">
+            <button onClick={handleCloseRoadmap} className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm">
+              Close
+            </button>
+            <h2 className="text-xl font-bold mb-4">Generated Roadmap</h2>
+            <RoadmapFlow roadmapData={roadmapData} />
+          </div>
         </div>
       )}
     </div>
