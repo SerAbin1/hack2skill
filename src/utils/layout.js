@@ -10,8 +10,8 @@ export const getLayoutedElements = (nodes, edges, direction = "TB") => {
   const isHorizontal = direction === "LR";
   dagreGraph.setGraph({
     rankdir: direction,
-    ranksep: 70, // Increases vertical spacing
-    nodesep: 50, // Increases horizontal spacing
+    ranksep: 150, // Increased vertical spacing
+    nodesep: 100, // Increased horizontal spacing
   });
 
   nodes.forEach((node) => {

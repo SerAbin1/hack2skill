@@ -3,7 +3,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import RoadmapFlow from "../components/RoadmapFlow"; // Import the RoadmapFlow component
+import RoadmapFlow from "../components/RoadmapFlow";
 
 const ProfilePage = () => {
   const [profileData, setProfileData] = useState(null);
@@ -39,29 +39,24 @@ const ProfilePage = () => {
     }
   };
 
-  const handleGenerateRoadmap = async () => {
+  const handleShowRoadmap = async () => {
     setRoadmapLoading(true);
     setRoadmapData(null);
     try {
-      const response = await fetch('http://localhost:3000/api/generate-roadmap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          education: profileData?.education?.lastEducation,
-          field: profileData?.personalDetails?.field,
-          skills: profileData?.skills?.checked
-        }),
-      });
+      const user = auth.currentUser;
+      if (!user) throw new Error("No logged-in user");
+      
+      const docRef = doc(db, "roadmaps", user.uid);
+      const docSnap = await getDoc(docRef);
 
-      if (!response.ok) {
-        throw new Error('Failed to generate roadmap.');
+      if (docSnap.exists()) {
+        setRoadmapData(docSnap.data());
+      } else {
+        alert("No roadmap found. Please contact support.");
       }
-
-      const data = await response.json();
-      setRoadmapData(data);
     } catch (error) {
-      console.error("Error generating roadmap:", error);
-      alert("Failed to generate roadmap. Please try again.");
+      console.error("Error fetching roadmap:", error);
+      alert("Failed to fetch roadmap. Please try again.");
     } finally {
       setRoadmapLoading(false);
     }
@@ -95,11 +90,11 @@ const ProfilePage = () => {
         </div>
         <div className="mt-6 flex flex-col items-center">
           <button
-            onClick={handleGenerateRoadmap}
+            onClick={handleShowRoadmap}
             disabled={roadmapLoading}
             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
           >
-            {roadmapLoading ? "Generating..." : "Generate My Learning Roadmap"}
+            {roadmapLoading ? "Loading Roadmap..." : "Show My Learning Roadmap"}
           </button>
         </div>
       </div>

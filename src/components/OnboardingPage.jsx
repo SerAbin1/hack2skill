@@ -21,9 +21,7 @@ const OnboardingPage = () => {
     workExperience: "",
   });
 
-  // State to hold all options for checkboxes
   const [generatedLists, setGeneratedLists] = useState({ interestedFields: [], skills: [] });
-
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -36,10 +34,8 @@ const OnboardingPage = () => {
     setFormData((prev) => {
       const current = prev[name] || [];
       if (current.includes(value)) {
-        // If already checked, remove it
         return { ...prev, [name]: current.filter((item) => item !== value) };
       } else {
-        // If not checked, add it
         return { ...prev, [name]: [...current, value] };
       }
     });
@@ -48,7 +44,7 @@ const OnboardingPage = () => {
   const handleNextStep = async () => {
     const currentSteps = onboardingSteps(formData, handleChange, handleCheckboxChange, generatedLists);
 
-    if (currentSteps[step].title === "Education") {
+    if (currentSteps[step]?.title === "Education") {
       setAiLoading(true);
       try {
         const response = await fetch('http://localhost:3000/api/generate-lists', {
@@ -64,7 +60,6 @@ const OnboardingPage = () => {
         });
 
         const data = await response.json();
-        // Update the generatedLists state with the full lists from the AI
         setGeneratedLists({
           interestedFields: data.interestedFields || [],
           skills: data.skills || []
@@ -84,6 +79,7 @@ const OnboardingPage = () => {
       const user = auth.currentUser;
       if (!user) throw new Error("No logged-in user");
 
+      // 1. Save user profile data to Firestore
       await setDoc(doc(db, "users", user.uid), {
         personalDetails: {
           name: formData.name,
@@ -108,6 +104,26 @@ const OnboardingPage = () => {
         createdAt: new Date(),
       });
 
+      // 2. Generate and save the roadmap to a new collection
+      const roadmapResponse = await fetch('http://localhost:3000/api/generate-roadmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          education: formData.lastEducation,
+          field: formData.field,
+          skills: formData.skills,
+        }),
+      });
+
+      if (!roadmapResponse.ok) {
+        throw new Error('Failed to generate roadmap.');
+      }
+      
+      const roadmapData = await roadmapResponse.json();
+      await setDoc(doc(db, "roadmaps", user.uid), roadmapData);
+      
       setSuccess(true);
     } catch (err) {
       console.error("Error saving data:", err);
@@ -127,19 +143,9 @@ const OnboardingPage = () => {
   };
 
   if (success) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <h2 className="text-2xl font-bold text-green-600">
-          🎉 Profile saved successfully!
-        </h2>
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600"
-        >
-          Logout
-        </button>
-      </div>
-    );
+    // Navigate to the profile page after successful submission
+    navigate("/profile");
+    return null; // Return null to prevent rendering
   }
 
   const steps = onboardingSteps(formData, handleChange, handleCheckboxChange, generatedLists);
