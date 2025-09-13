@@ -17,11 +17,16 @@ body {
 .top-nav {
   position: absolute;
   top: 20px;
-  right: 30px;
+  left: 0;
+  right: 0;
   display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 30px;
   gap: 10px;
   z-index: 1000;
 }
+
 
 .nav-btn {
   background: #2c2c2e;

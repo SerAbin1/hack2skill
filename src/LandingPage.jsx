@@ -1,31 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LandingPage.css";
 
 const LandingPage = () => {
+  const [theme, setTheme] = useState("dark");
+
   return (
-    <div className="landing-container">
+    <div className={`landing-container ${theme}`}>
       {/* TOP NAVIGATION */}
       <div className="top-nav">
+         <div className="top-right"></div>
         <button className="nav-btn">LOG IN</button>
-      
+        
+        
       </div>
 
       {/* LOGO / TITLE */}
       <div className="logo-box">
         <h1>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>C</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>a</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>r</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>e</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>e</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>r</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>C</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>o</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>m</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>p</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>a</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>s</span>
-          <span style={{ color: "#c2aaff", fontWeight: "bold" }}>s</span>
+          {"CareerCompass".split("").map((char, i) => (
+            <span key={i} style={{ color: "#c2aaff", fontWeight: "bold" }}>
+              {char}
+            </span>
+          ))}
         </h1>
         <p>Your AI Career Companion</p>
       </div>
