@@ -1,50 +1,85 @@
-import React, { useMemo } from "react";
-import ReactFlow, { Background, Controls } from "reactflow";
-import "reactflow/dist/style.css";
+// src/components/RoadmapFlow.jsx
+import React, { useMemo, useCallback } from "react";
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Controls,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import { roadmapToFlow } from "../utils/RoadmapToFlow";
 import { getLayoutedElements } from "../utils/layout";
 import CheckboxNode from "./CheckboxNode";
 
+// Custom node type
 const nodeTypes = { checkboxNode: CheckboxNode };
 
 const RoadmapFlow = ({ roadmapData }) => {
-  const { nodes, edges } = useMemo(() => {
-    if (!roadmapData) return { nodes: [], edges: [] };
+  // Prepare nodes + edges from roadmap data
+  const { initialNodes, initialEdges } = useMemo(() => {
+    if (!roadmapData) return { initialNodes: [], initialEdges: [] };
 
     const { nodes: newNodes, edges: newEdges } = roadmapToFlow(roadmapData);
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       newNodes,
       newEdges,
-      "TB"
+      "LR" // 👈 Horizontal layout (Left → Right)
     );
-    return { nodes: layoutedNodes, edges: layoutedEdges };
-  }, [roadmapData]);
 
-  // Handle the onCheck functionality by adding it to the node data
-  const nodesWithCheckHandler = useMemo(() => {
-    return nodes.map((node) => ({
+    // Add checkbox click handler
+    const nodesWithCheckHandler = layoutedNodes.map((node) => ({
       ...node,
       data: {
         ...node.data,
         onCheck: () => {
           console.log(`Checkbox clicked for node: ${node.data.label}`);
-          // You can add logic here to update the state if you decide to make it interactive later
         },
       },
     }));
-  }, [nodes]);
+
+    // Style edges (smoothstep + animated)
+    const styledEdges = layoutedEdges.map((edge) => ({
+      ...edge,
+      type: "smoothstep",
+      animated: true,
+    }));
+
+    return { initialNodes: nodesWithCheckHandler, initialEdges: styledEdges };
+  }, [roadmapData]);
+
+  // Local state for nodes + edges
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Handle manual connections
+  const onConnect = useCallback(
+    (params) =>
+      setEdges((eds) =>
+        addEdge({ ...params, type: "smoothstep", animated: true }, eds)
+      ),
+    [setEdges]
+  );
 
   return (
     <div style={{ width: "100%", height: "90vh" }}>
-      <ReactFlow
-        nodes={nodesWithCheckHandler}
-        edges={edges}
-        fitView
-        nodeTypes={nodeTypes}
-      >
-        <Background gap={16} color="#aaa" />
-        <Controls />
-      </ReactFlow>
+      <ReactFlowProvider>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+          attributionPosition="bottom-left"
+        >
+          <Background gap={16} color="#aaa" />
+          <Controls />
+        </ReactFlow>
+      </ReactFlowProvider>
     </div>
   );
 };

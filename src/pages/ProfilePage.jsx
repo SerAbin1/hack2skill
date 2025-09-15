@@ -4,6 +4,7 @@ import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import RoadmapFlow from "../components/RoadmapFlow";
+import { ReactFlowProvider } from "reactflow"; // ✅ Added
 
 const ProfilePage = () => {
   const [profileData, setProfileData] = useState(null);
@@ -129,6 +130,7 @@ const ProfilePage = () => {
           </button>
         </div>
       </div>
+
       {showRoadmapModal && roadmapData && (
         <div className="fixed inset-0 bg-black/5 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-3xl border border-gray-200 relative">
@@ -136,7 +138,11 @@ const ProfilePage = () => {
               Close
             </button>
             <h2 className="text-xl font-bold mb-4">Generated Roadmap</h2>
-            <RoadmapFlow roadmapData={roadmapData} />
+            
+            {/* ✅ Wrap RoadmapFlow inside ReactFlowProvider */}
+            <ReactFlowProvider>
+              <RoadmapFlow roadmapData={roadmapData} />
+            </ReactFlowProvider>
           </div>
         </div>
       )}
