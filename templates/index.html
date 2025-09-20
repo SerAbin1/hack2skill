@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume / Skills Input</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <div class="container">
+      <h1>Resume / Skills Input</h1>
+
+      <form id="skillsForm" enctype="multipart/form-data">
+        <!-- Resume Upload -->
+        <div class="form-group">
+          <label for="resumeFile">Upload Resume (PDF/DOCX)</label>
+          <div class="file-upload-wrapper">
+            <div class="file-upload-button" id="fileUploadButton">Choose File</div>
+            <input type="file" id="resumeFile" name="resume_file" accept=".pdf,.docx">
+          </div>
+          <div id="fileName" class="file-name"></div>
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="form-group">
+          <label for="categorySelect">Select Skill Category</label>
+          <select id="categorySelect">
+            <option value="">-- Select Category --</option>
+          </select>
+          <div class="hint">Pick a category, check skills, then switch categories to add more.</div>
+        </div>
+
+        <!-- Skills Checkboxes -->
+        <div class="form-group">
+          <label>Skills</label>
+          <div class="skills-container" id="skillsContainer">
+            <div class="placeholder">Choose a category to see skills</div>
+          </div>
+          <div class="selected-count" id="selectedCount">0 skills selected</div>
+        </div>
+
+        <!-- Manual Skills + Suggestions -->
+        <div class="form-group relative">
+          <label for="manualSkills">Add Additional Skills (comma-separated OR pick from suggestions)</label>
+          <input type="text" id="manualSkills" placeholder="Start typing… e.g., python">
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Submit</button>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          Processing your request…
+        </div>
+      </form>
+
+      <div class="results-section" id="resultsSection" style="display:none;">
+        <h2>Detected Skills</h2>
+        <ul class="skills-list" id="skillsList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
