@@ -44,9 +44,26 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/*
+          New logic:
+          - If the user is logged in, navigate to /profile.
+          - Otherwise, show the LandingPage.
+        */}
+        <Route
+          path="/"
+          element={user ? <Navigate to="/profile" /> : <LandingPage />}
+        />
+        {/*
+          Protect the /homepage route.
+          - If the user is logged in, show Homepage.
+          - Otherwise, navigate to /login.
+        */}
+        <Route
+          path="/homepage"
+          element={user ? <Homepage /> : <Navigate to="/login" />}
+        />
+        
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/homepage" element={<Homepage />} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Auth + Profile Routes */}
