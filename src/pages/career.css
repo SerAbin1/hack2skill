@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800&display=swap');
+
+:root {
+  /* Brand palette from image */
+  --brand-blue: #72BBFF;   /* primary accent blue */
+  --brand-ink: #050F2A;    /* deep navy for text */
+  --brand-surface: #F2FDFF;/* soft surface */
+  --brand-lavender: #BBA0FF;/* secondary accent */
+
+  /* Mapped semantic tokens */
+  --primary: var(--brand-lavender);
+  --primary-light: #C8B7FF;
+  --primary-dark: #9C84F0;
+  --accent: var(--brand-blue);
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Neutral scale tuned toward palette */
+  --gray-50: var(--brand-surface);
+  --gray-100: #E9F6FF;
+  --gray-200: #D7EAFB;
+  --gray-300: #BFD8F3;
+  --gray-400: #90A4C0;
+  --gray-500: #6E7FA2;
+  --gray-600: #4E5E81;
+  --gray-700: #2F3F62;
+  --gray-800: #1C2740;
+  --gray-900: var(--brand-ink);
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: radial-gradient(1200px 800px at 100% -10%, rgba(187,160,255,0.18), transparent 60%),
+              radial-gradient(1000px 700px at -10% 0%, rgba(114,187,255,0.18), transparent 55%),
+              var(--gray-50);
+  color: var(--gray-900);
+}
+
+.app-container {
+  min-height: 100vh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title font: using Playfair Display as a high-contrast stand-in for Talkine */
+.app-title {
+  font-family: 'Playfair Display', 'Plus Jakarta Sans', serif;
+  font-size: 40px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--gray-900);
+}
+
+/* Input label row with icon at the left */
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.label-icon {
+  color: var(--gray-900);
+  display: inline-flex;
+  align-items: center;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+}
+
+.card {
+  background: rgba(255,255,255,0.8);
+  border-radius: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  width: 100%;
+  flex: 1;
+}
+
+.card-highlight {
+  border-left: 4px solid var(--primary);
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #F7FAFF;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  font-size: 15px;
+  color: var(--gray-900);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: var(--gray-400);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(114, 187, 255, 0.25);
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background-image: linear-gradient(135deg, var(--accent), var(--primary));
+  color: white;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 16px 24px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.btn-outline:hover {
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background-color: rgba(187, 160, 255, 0.18);
+  color: var(--primary);
+}
+
+.badge-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-300) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--gray-300);
+  border-radius: 3px;
+}
+
+.chat-message {
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.chat-bubble {
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 85%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.chat-bubble-user {
+  background-image: linear-gradient(135deg, var(--accent), var(--primary));
+  color: white;
+  border-bottom-right-radius: 0;
+  margin-left: auto;
+}
+
+.chat-bubble-ai {
+  background-color: rgba(255,255,255,0.9);
+  border-bottom-left-radius: 0;
+}
+
+.career-step {
+  border-left: 2px solid var(--gray-300);
+  padding-left: 24px;
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.career-step::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--primary);
+}
+
+.career-step:last-child {
+  border-left: 2px solid transparent;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}

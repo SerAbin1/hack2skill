@@ -27,7 +27,7 @@ const Homepage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="landing-container">
+    <div className="landing-container w-screen bg-black/10">
       {/* TOP NAV */}
       <div className="top-nav">
         <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
@@ -59,7 +59,7 @@ const Homepage = () => {
             <li>Learning Hub</li>
             <li>Progress Tracker</li>
             <li>Copilot Mentor</li>
-            <li>Career Explorer</li>
+            <li onClick={() => navigate("/careeradvisor")}>Career Explorer</li>
           </ul>
         </div>
       )}
@@ -157,7 +157,7 @@ const Homepage = () => {
       <div className="button-grid">
         <button className="menu-btn">Take Skill Quiz</button>
         <ResumeUpload />
-        <button className="menu-btn">Explore Careers</button>
+        <button className="menu-btn" onClick={() => navigate("/careeradvisor")}>Explore Careers</button>
         <button className="menu-btn">Watch Intro Video</button>
       </div>
 

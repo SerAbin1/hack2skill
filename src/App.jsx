@@ -9,6 +9,7 @@ import OnboardingPage from "./components/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import LandingPage from "./LandingPage";
 import Homepage from "./Homepage";
+import CareerAdvisor from "./pages/CareerAdvisor";
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -61,6 +62,10 @@ function App() {
         <Route
           path="/homepage"
           element={user ? <Homepage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/careeradvisor"
+          element={user ? <CareerAdvisor /> : <Navigate to="/login" />}
         />
         
         {/* Public Routes */}
