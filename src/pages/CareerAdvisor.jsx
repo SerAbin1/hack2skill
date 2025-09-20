@@ -170,7 +170,7 @@ const CareerAdvisor = () => {
   return (
     <div className="app-container">
       <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <main className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Panel: User Interaction */}
           <div className="card flex flex-col h-[90vh] max-h-[900px]">
             <div className="p-6">

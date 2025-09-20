@@ -1,30 +1,96 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Homepage.css";
 import ResumeUpload from "./components/ResumeUpload";
+import { auth, db } from "./firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { ReactFlowProvider } from "reactflow"; // ✅ Added
+import RoadmapFlow from "./components/RoadmapFlow"; // ✅ Added
 
 const Homepage = () => {
+  const [user, loading] = useAuthState(auth);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
-  const [profile, setProfile] = useState({
-    name: "Sravya Isukapatla",
-    phone: "+91 98765 43210",
-    email: "sravyaisukapatla@gmail.com",
-    linkedin: "https://linkedin.com/in/sravya-isukapatla-07776329b",
-  });
+  const [roadmapData, setRoadmapData] = useState(null); // ✅ Added
+  const [roadmapLoading, setRoadmapLoading] = useState(false); // ✅ Added
+  const [showRoadmapModal, setShowRoadmapModal] = useState(false); // ✅ Added
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (user) {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setProfileData(docSnap.data());
+        } else {
+          console.log("No profile data found!");
+        }
+      }
+      setProfileLoading(false);
+    };
+    fetchProfileData();
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
+    setProfileData({ ...profileData, [name]: value });
   };
 
   const handleSave = () => {
+    // Implement save functionality here if needed
     setIsEditing(false);
   };
 
-  const navigate = useNavigate();
+  // ✅ Fetch roadmap when button is clicked
+  const handleShowRoadmap = async () => {
+    setRoadmapLoading(true);
+    setRoadmapData(null);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error("No logged-in user");
+
+      const docRef = doc(db, "roadmaps", currentUser.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setRoadmapData(docSnap.data());
+        setShowRoadmapModal(true);
+      } else {
+        alert("No roadmap found. Please contact support.");
+      }
+    } catch (error) {
+      console.error("Error fetching roadmap:", error);
+      alert("Failed to fetch roadmap. Please try again.");
+    } finally {
+      setRoadmapLoading(false);
+    }
+  };
+
+  const handleCloseRoadmap = () => {
+    setShowRoadmapModal(false);
+  };
+
+  if (loading || profileLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="landing-container w-screen bg-black/10">
@@ -37,9 +103,7 @@ const Homepage = () => {
         </div>
 
         <div className="top-right">
-          <div className="search-box">
-            <input type="text" placeholder="Type / to search" />
-          </div>
+          
 
           <div className="icons">
             <span className="icon">👥</span>
@@ -80,62 +144,77 @@ const Homepage = () => {
       {profileOpen && (
         <div className="profile-dropdown">
           <h2>👤 Profile</h2>
-
-          <div className="form-box">
-            <label>Name</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={profile.name}
-                onChange={handleChange}
-              />
-            ) : (
-              <span>{profile.name}</span>
-            )}
-          </div>
-
-          <div className="form-box">
-            <label>Contact</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="phone"
-                value={profile.phone}
-                onChange={handleChange}
-              />
-            ) : (
-              <span>{profile.phone}</span>
-            )}
-          </div>
-
-          <div className="form-box">
-            <label>Email</label>
-            {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                value={profile.email}
-                onChange={handleChange}
-              />
-            ) : (
-              <span>{profile.email}</span>
-            )}
-          </div>
-
-          <div className="form-box">
-            <label>LinkedIn</label>
-            {isEditing ? (
-              <input
-                type="url"
-                name="linkedin"
-                value={profile.linkedin}
-                onChange={handleChange}
-              />
-            ) : (
-              <span>{profile.linkedin}</span>
-            )}
-          </div>
+          {profileData ? (
+            <>
+              <div className="form-box">
+                <label>Name</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="name"
+                    value={profileData.personalDetails?.name}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{profileData.personalDetails?.name}</span>
+                )}
+              </div>
+              <div className="form-box">
+                <label>Education</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="education"
+                    value={profileData.education?.lastEducation}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{profileData.education?.lastEducation}</span>
+                )}
+              </div>
+              <div className="form-box">
+                <label>Skills</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="skills"
+                    value={profileData.skills?.checked.join(", ")}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{profileData.skills?.checked.join(", ")}</span>
+                )}
+              </div>
+              <div className="form-box">
+                <label>Interested Fields</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="interestedFields"
+                    value={profileData.interestedFields?.checked.join(", ")}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{profileData.interestedFields?.checked.join(", ")}</span>
+                )}
+              </div>
+              <div className="form-box">
+                <label>Work Experience</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="workExperience"
+                    value={profileData.work?.workExperience}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  <span>{profileData.work?.workExperience}</span>
+                )}
+              </div>
+            </>
+          ) : (
+            <div>No profile data available.</div>
+          )}
 
           {!isEditing ? (
             <button className="edit-toggle" onClick={() => setIsEditing(true)}>
@@ -143,13 +222,11 @@ const Homepage = () => {
             </button>
           ) : (
             <button className="save-btn" onClick={handleSave}>
-               Save
+              Save
             </button>
           )}
 
-       
-
-          <button className="logout-btn">Logout</button>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
       )}
 
@@ -157,17 +234,37 @@ const Homepage = () => {
       <div className="button-grid">
         <button className="menu-btn">Take Skill Quiz</button>
         <ResumeUpload />
-        <button className="menu-btn" onClick={() => navigate("/careeradvisor")}>Explore Careers</button>
+        <button className="menu-btn" onClick={handleShowRoadmap}>
+          {roadmapLoading ? "Loading Roadmap..." : "Career Roadmap"}
+        </button>
         <button className="menu-btn">Watch Intro Video</button>
       </div>
 
       {/* HERO SECTION */}
       <div className="hero-text">
-        <h2>Welcome, Sravya</h2>
+        <h2>Welcome, {profileData?.personalDetails?.name || "User"}</h2>
         <p>What career suits me if I love design?</p>
         <p>Suggested Careers: UX Designer, Product Designer Cocersza</p>
         <button className="btn-primary">Try Mock Interview</button>
       </div>
+
+      {/* ✅ Roadmap Modal */}
+      {showRoadmapModal && roadmapData && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-3xl border border-gray-200 relative">
+            <button
+              onClick={handleCloseRoadmap}
+              className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm"
+            >
+              Close
+            </button>
+            <h2 className="text-xl font-bold mb-4">Generated Roadmap</h2>
+            <ReactFlowProvider>
+              <RoadmapFlow roadmapData={roadmapData} />
+            </ReactFlowProvider>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

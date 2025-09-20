@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.1.13",
     "@xyflow/react": "^12.8.4",
     "dagre": "^0.8.5",
+    "dotenv": "^17.2.2",
     "firebase": "^12.3.0",
     "gojs": "^3.0.26",
     "lucide-react": "^0.544.0",

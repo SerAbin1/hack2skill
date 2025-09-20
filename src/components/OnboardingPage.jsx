@@ -120,10 +120,10 @@ const OnboardingPage = () => {
       if (!roadmapResponse.ok) {
         throw new Error('Failed to generate roadmap.');
       }
-      
+
       const roadmapData = await roadmapResponse.json();
       await setDoc(doc(db, "roadmaps", user.uid), roadmapData);
-      
+
       setSuccess(true);
     } catch (err) {
       console.error("Error saving data:", err);
@@ -144,7 +144,8 @@ const OnboardingPage = () => {
 
   if (success) {
     // Navigate to the profile page after successful submission
-    navigate("/profile");
+    // Navigate to the homepage after successful submission
+    navigate("/homepage");
     return null; // Return null to prevent rendering
   }
 

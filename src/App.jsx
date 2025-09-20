@@ -52,7 +52,13 @@ function App() {
         */}
         <Route
           path="/"
-          element={user ? <Navigate to="/profile" /> : <LandingPage />}
+          element={
+            user ? (
+              hasProfile ? <Navigate to="/homepage" /> : <Navigate to="/onboarding" />
+            ) : (
+              <LandingPage />
+            )
+          }
         />
         {/*
           Protect the /homepage route.
@@ -67,7 +73,7 @@ function App() {
           path="/careeradvisor"
           element={user ? <CareerAdvisor /> : <Navigate to="/login" />}
         />
-        
+
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
 
@@ -76,22 +82,24 @@ function App() {
           path="/onboarding"
           element={
             user ? (
-              hasProfile ? <Navigate to="/profile" /> : <OnboardingPage />
+              hasProfile ? <Navigate to="/homepage" /> : <OnboardingPage />
             ) : (
               <Navigate to="/login" />
             )
           }
         />
+
         <Route
           path="/profile"
           element={
             user ? (
-              hasProfile ? <ProfilePage /> : <Navigate to="/onboarding" />
+              hasProfile ? <Homepage /> : <Navigate to="/onboarding" />
             ) : (
               <Navigate to="/login" />
             )
           }
         />
+
       </Routes>
     </Router>
   );

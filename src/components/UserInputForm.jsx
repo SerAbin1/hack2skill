@@ -3,8 +3,8 @@ import { Briefcase, Lightbulb, Zap, Target } from 'lucide-react';
 import InputField from './InputField';
 
 const UserInputForm = ({ userProfile, handleInputChange, handleStartAdvisor, error }) => (
-  <form onSubmit={handleStartAdvisor} className="space-y-12">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+  <form onSubmit={handleStartAdvisor} className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
       <InputField 
         icon={<Briefcase className="h-5 w-5 text-gray-400" />}
         name="currentRole"
@@ -46,7 +46,7 @@ const UserInputForm = ({ userProfile, handleInputChange, handleStartAdvisor, err
     
     <button 
       type="submit" 
-      className="btn btn-primary w-full flex items-center justify-center gap-2 mt-12"
+      className="btn btn-primary w-full flex items-center justify-center gap-2 mt-8"
     >
       <Zap className="h-5 w-5" />
       Generate My Career Plan
