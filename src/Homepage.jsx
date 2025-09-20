@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Homepage.css";
+import ResumeUpload from "./components/ResumeUpload";
 
 const Homepage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -155,7 +156,7 @@ const Homepage = () => {
       {/* BUTTON GRID */}
       <div className="button-grid">
         <button className="menu-btn">Take Skill Quiz</button>
-        <button className="menu-btn">Upload Resume</button>
+        <ResumeUpload />
         <button className="menu-btn">Explore Careers</button>
         <button className="menu-btn">Watch Intro Video</button>
       </div>
