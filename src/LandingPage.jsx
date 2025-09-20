@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // <-- Import Link
 import "./LandingPage.css";
 
 const LandingPage = () => {
@@ -8,10 +9,10 @@ const LandingPage = () => {
     <div className={`landing-container ${theme}`}>
       {/* TOP NAVIGATION */}
       <div className="top-nav">
-         <div className="top-right"></div>
-        <button className="nav-btn">LOG IN</button>
-        
-        
+        <div className="top-right"></div>
+        <Link to="/login" className="nav-btn">
+          LOG IN
+        </Link>
       </div>
 
       {/* LOGO / TITLE */}
@@ -41,7 +42,9 @@ const LandingPage = () => {
           AI Resume Builder • Automated Job Tracking • Optimize your LinkedIn
           Profile • And Much More...
         </p>
-        <button className="btn-primary">SIGN UP FOR FREE</button>
+        <Link to="/login" className="btn-primary">
+          SIGN UP FOR FREE
+        </Link>
       </div>
     </div>
   );
