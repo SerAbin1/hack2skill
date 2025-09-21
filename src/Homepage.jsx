@@ -15,15 +15,12 @@ const Homepage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
-
   const [roadmapData, setRoadmapData] = useState(null);
   const [roadmapLoading, setRoadmapLoading] = useState(false);
   const [showRoadmapModal, setShowRoadmapModal] = useState(false);
-
   const [showSalaryModal, setShowSalaryModal] = useState(false);
   const [salaryLoading, setSalaryLoading] = useState(false);
   const [salaryResult, setSalaryResult] = useState({ insights: "", context: "" });
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +28,6 @@ const Homepage = () => {
       if (user) {
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
-
         if (docSnap.exists()) {
           setProfileData(docSnap.data());
         } else {
@@ -42,6 +38,37 @@ const Homepage = () => {
     };
     fetchProfileData();
   }, [user]);
+
+  // --- HELPER FUNCTION FOR TEXT-BASED GEMINI API CALL ---
+  const callGeminiForText = async (prompt) => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("VITE_GEMINI_API_KEY is not defined in the .env file");
+    }
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const payload = {
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error.message || `API call failed with status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (text === undefined) {
+        throw new Error("Invalid response structure from Gemini API.");
+    }
+    return text;
+  };
 
   const handleLogout = async () => {
     try {
@@ -88,45 +115,50 @@ const Homepage = () => {
   const handleCloseRoadmap = () => {
     setShowRoadmapModal(false);
   };
-
-  // --- UPDATED Function for Salary Insights ---
+  
+  // --- MODIFIED handleShowSalary ---
   const handleShowSalary = async () => {
     const interestedFields = profileData?.interestedFields?.checked || [];
     const skills = profileData?.skills?.checked || [];
 
     if (interestedFields.length === 0 && skills.length === 0) {
-      alert(
-        "Please complete your profile with skills or interested fields to get salary insights."
-      );
+      alert("Please complete your profile with skills or interested fields to get salary insights.");
       return;
     }
 
     const location = "India";
     const contextForDisplay = [...interestedFields, ...skills].join(", ");
+    const userContext = contextForDisplay; // The combined string for the prompt
 
     setShowSalaryModal(true);
     setSalaryLoading(true);
-    setSalaryResult({ insights: "", context: "" }); // Clear previous results
+    setSalaryResult({ insights: "", context: contextForDisplay });
 
     try {
-      const res = await fetch("http://localhost:3000/api/salary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // ✅ Send both arrays to the backend
-        body: JSON.stringify({ interestedFields, skills, location }),
-      });
+      // This is the exact prompt from your backend, now used in the frontend
+      const prompt = `Based on a user's combined interests and skills in "${userContext}", determine the most relevant job role and provide a concise, well-structured salary analysis for that role in ${location}.
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch salary data from the server.");
-      }
+      Your response must follow this exact format:
+      
+      Role: [The job role you determined]
+      
+      Salary Range (Annual):
+      - Entry-level (0-2 yrs): [Salary range in LPA format, e.g., ₹X LPA - ₹Y LPA]
+      - Mid-level (3-5 yrs): [Salary range in LPA format]
+      - Senior-level (6+ yrs): [Salary range in LPA format]
+      
+      Key Factors:
+      [A short, easy-to-read paragraph (2-3 sentences) explaining the main factors like location (e.g., Bangalore, Mumbai), company size, and specific high-demand skills that affect the salary for this role.]
+      
+      Use aggregated public data from sources like Glassdoor, LinkedIn Salary, and AmbitionBox for your analysis. Ensure the output is clean, easy to read, and contains only the information specified above. Do not add any extra introduction or conclusion.`;
 
-      const data = await res.json();
-      setSalaryResult({ insights: data.insights, context: contextForDisplay });
+      const insightsText = await callGeminiForText(prompt);
+      setSalaryResult({ insights: insightsText, context: contextForDisplay });
+
     } catch (error) {
-      console.error("Error fetching salary insights:", error);
+      console.error("Error fetching salary insights from Gemini:", error);
       setSalaryResult({
-        insights:
-          "Sorry, I couldn't fetch salary insights right now. Please try again later.",
+        insights: `Sorry, I couldn't fetch salary insights right now. Error: ${error.message}`,
         context: contextForDisplay,
       });
     } finally {
@@ -141,7 +173,7 @@ const Homepage = () => {
   if (loading || profileLoading) {
     return <div>Loading...</div>;
   }
-
+  
   return (
     <div className="landing-container w-screen bg-black/10">
       {/* TOP NAV */}
@@ -302,7 +334,7 @@ const Homepage = () => {
         </div>
       )}
 
-      {/* --- UPDATED Salary Insights Modal --- */}
+      {/* UPDATED Salary Insights Modal */}
       {showSalaryModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-gray-800 text-white shadow-xl rounded-2xl p-6 w-full max-w-md border border-purple-400 relative mx-4">
@@ -319,7 +351,6 @@ const Homepage = () => {
               <p>Fetching insights for you...</p>
             ) : (
               <div>
-                {/* ✅ Display the context used for the query */}
                 <p className="text-lg font-semibold mb-2">
                   Based on:{" "}
                   <span className="capitalize font-normal text-purple-300">
