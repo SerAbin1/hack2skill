@@ -11,7 +11,6 @@ import RoadmapFlow from "./components/RoadmapFlow"; // ✅ Added
 
 const Homepage = () => {
   const [user, loading] = useAuthState(auth);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -96,37 +95,15 @@ const Homepage = () => {
     <div className="landing-container w-screen bg-black/10">
       {/* TOP NAV */}
       <div className="top-nav">
-        <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-        </div>
-
         <div className="top-right">
           
 
-          <div className="icons">
-            <span className="icon">👥</span>
-          </div>
-
           <div className="avatar" onClick={() => setProfileOpen(!profileOpen)}>
-            <img src="/avatar.png" alt="Profile" />
+            {/* <img src="/avatar.png" alt="Profile" /> */}
+            <span className="icon cursor-pointer">👥</span>
           </div>
         </div>
       </div>
-
-      {/* Slide-out Menu */}
-      {menuOpen && (
-        <div className={`side-menu ${menuOpen ? "show" : ""}`}>
-          <ul>
-            <li>Career Matches</li>
-            <li>Learning Hub</li>
-            <li>Progress Tracker</li>
-            <li>Copilot Mentor</li>
-            <li onClick={() => navigate("/careeradvisor")}>Career Explorer</li>
-          </ul>
-        </div>
-      )}
 
       {/* LOGO / TITLE */}
       <div className="logo-box">
@@ -237,7 +214,9 @@ const Homepage = () => {
         <button className="menu-btn" onClick={handleShowRoadmap}>
           {roadmapLoading ? "Loading Roadmap..." : "Career Roadmap"}
         </button>
-        <button className="menu-btn">Watch Intro Video</button>
+        <button className="menu-btn" onClick={() => navigate("/careeradvisor")}>
+          Career Explorer
+        </button>
       </div>
 
       {/* HERO SECTION */}
@@ -250,8 +229,8 @@ const Homepage = () => {
 
       {/* ✅ Roadmap Modal */}
       {showRoadmapModal && roadmapData && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-3xl border border-gray-200 relative">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-90">
+          <div className="bg-white shadow-xl text-black rounded-2xl p-6 w-full max-w-[90vw] border border-gray-200 relative">
             <button
               onClick={handleCloseRoadmap}
               className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm"

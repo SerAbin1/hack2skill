@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
@@ -23,8 +23,9 @@ const OnboardingPage = () => {
 
   const [generatedLists, setGeneratedLists] = useState({ interestedFields: [], skills: [] });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  // Removed 'success' state as it's not used before navigating away
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -59,6 +60,12 @@ const OnboardingPage = () => {
           }),
         });
 
+        // Add this check to see if the API call was successful
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to fetch suggestions.');
+        }
+
         const data = await response.json();
         setGeneratedLists({
           interestedFields: data.interestedFields || [],
@@ -66,6 +73,7 @@ const OnboardingPage = () => {
         });
       } catch (error) {
         console.error("Error fetching AI data:", error);
+        alert(`Could not generate suggestions: ${error.message}`); // Inform the user
       } finally {
         setAiLoading(false);
       }
@@ -73,14 +81,16 @@ const OnboardingPage = () => {
     setStep(step + 1);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
+
     setLoading(true);
     try {
       const user = auth.currentUser;
-      if (!user) throw new Error("No logged-in user");
+      if (!user) throw new Error("No logged-in user found. Please log in again.");
 
       // 1. Save user profile data to Firestore
-      await setDoc(doc(db, "users", user.uid), {
+      const userProfile = {
         personalDetails: {
           name: formData.name,
           age: formData.age,
@@ -102,9 +112,12 @@ const OnboardingPage = () => {
         },
         email: user.email,
         createdAt: new Date(),
-      });
+      };
+      await setDoc(doc(db, "users", user.uid), userProfile);
+      console.log("User profile saved successfully.");
 
-      // 2. Generate and save the roadmap to a new collection
+
+      // 2. Generate and save the roadmap
       const roadmapResponse = await fetch('http://localhost:3000/api/generate-roadmap', {
         method: 'POST',
         headers: {
@@ -118,20 +131,26 @@ const OnboardingPage = () => {
       });
 
       if (!roadmapResponse.ok) {
-        throw new Error('Failed to generate roadmap.');
+        const errorData = await roadmapResponse.json();
+        throw new Error(errorData.message || 'Failed to generate roadmap from server.');
       }
 
       const roadmapData = await roadmapResponse.json();
       await setDoc(doc(db, "roadmaps", user.uid), roadmapData);
+      console.log("Roadmap saved successfully.");
 
-      setSuccess(true);
+      // If all await calls succeed, force a full page navigation.
+      console.log("All data saved. Forcing a reload to the homepage...");
+      window.location.href = "/homepage";
+
     } catch (err) {
-      console.error("Error saving data:", err);
-      alert(err.message);
+      console.error("An error occurred during the save process:", err);
+      alert(`Error: ${err.message}`); 
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleLogout = async () => {
     try {
@@ -141,13 +160,6 @@ const OnboardingPage = () => {
       console.error("Error logging out:", error);
     }
   };
-
-  if (success) {
-    // Navigate to the profile page after successful submission
-    // Navigate to the homepage after successful submission
-    navigate("/homepage");
-    return null; // Return null to prevent rendering
-  }
 
   const steps = onboardingSteps(formData, handleChange, handleCheckboxChange, generatedLists);
 
@@ -173,7 +185,7 @@ const OnboardingPage = () => {
 
         {/* Navigation */}
         <div className="flex justify-between mt-6">
-          {step > 0 && (
+          {step > 0 && !aiLoading && (
             <button
               onClick={() => setStep(step - 1)}
               className="px-4 py-2 bg-gray-300 rounded-lg"
@@ -181,23 +193,26 @@ const OnboardingPage = () => {
               Prev
             </button>
           )}
-          {step < steps.length - 1 ? (
-            <button
-              onClick={handleNextStep}
-              disabled={aiLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg"
-            >
-              {loading ? "Saving..." : "Submit"}
-            </button>
-          )}
+          {/* Ensure the Prev button is offset correctly when there is no Next button */}
+          <div className={`${step === 0 ? 'ml-auto' : ''}`}>
+             {step < steps.length - 1 ? (
+                <button
+                  onClick={handleNextStep}
+                  disabled={aiLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-blue-300"
+                >
+                  {aiLoading ? 'Thinking...' : 'Next'}
+                </button>
+              ) : (
+                <button
+                  onClick={handleSave}
+                  disabled={loading}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:bg-green-300"
+                >
+                  {loading ? "Saving..." : "Submit"}
+                </button>
+              )}
+          </div>
         </div>
       </div>
     </div>

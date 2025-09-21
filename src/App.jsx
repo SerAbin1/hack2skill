@@ -13,7 +13,7 @@ import CareerAdvisor from "./pages/CareerAdvisor";
 
 function App() {
   const [user, loading] = useAuthState(auth);
-  const [hasProfile, setHasProfile] = useState(false);
+  const [hasProfile, setHasProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
@@ -27,18 +27,16 @@ function App() {
         } else {
           setHasProfile(false);
         }
+      } else {
+        setHasProfile(false);
       }
       setProfileLoading(false);
     };
 
-    if (user) {
-      checkUserProfile();
-    } else {
-      setProfileLoading(false);
-    }
+    checkUserProfile();
   }, [user]);
 
-  if (loading || profileLoading) {
+  if (loading || profileLoading || hasProfile === null) {
     return <div>Loading...</div>;
   }
 
@@ -67,7 +65,13 @@ function App() {
         */}
         <Route
           path="/homepage"
-          element={user ? <Homepage /> : <Navigate to="/login" />}
+          element={
+            user ? (
+              hasProfile ? <Homepage /> : <Navigate to="/onboarding" />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route
           path="/careeradvisor"
