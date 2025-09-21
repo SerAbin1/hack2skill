@@ -21,6 +21,7 @@ const Homepage = () => {
   const [showSalaryModal, setShowSalaryModal] = useState(false);
   const [salaryLoading, setSalaryLoading] = useState(false);
   const [salaryResult, setSalaryResult] = useState({ insights: "", context: "" });
+  const [showResumeModal, setShowResumeModal] = useState(false); // State for resume modal
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -143,7 +144,7 @@ const Homepage = () => {
       Role: [The job role you determined]
       
       Salary Range (Annual):
-      - Entry-level (0-2 yrs): [Salary range in LPA format, e.g., ₹X LPA - ₹Y LPA]
+      - Entry-level (0-2 yrs): [Salary range in LPA format, e.g., 竄ｹX LPA - 竄ｹY LPA]
       - Mid-level (3-5 yrs): [Salary range in LPA format]
       - Senior-level (6+ yrs): [Salary range in LPA format]
       
@@ -170,17 +171,25 @@ const Homepage = () => {
     setShowSalaryModal(false);
   };
 
+  const handleShowResumeAnalyzer = () => {
+    setShowResumeModal(true);
+  };
+
+  const handleCloseResumeAnalyzer = () => {
+    setShowResumeModal(false);
+  };
+
   if (loading || profileLoading) {
     return <div>Loading...</div>;
   }
   
   return (
-    <div className="landing-container w-screen bg-black/10">
+    <div className="landing-container h-screen w-screen ">
       {/* TOP NAV */}
       <div className="top-nav">
         <div className="top-right">
           <div className="avatar" onClick={() => setProfileOpen(!profileOpen)}>
-            <span className="icon cursor-pointer">👥</span>
+            <span className="icon cursor-pointer">🙋🏻</span>
           </div>
         </div>
       </div>
@@ -200,7 +209,7 @@ const Homepage = () => {
       {/* PROFILE DROPDOWN */}
       {profileOpen && (
         <div className="profile-dropdown">
-          <h2>👤 Profile</h2>
+          <h2>🙋🏻 Profile</h2>
           {profileData ? (
             <>
               <div className="form-box">
@@ -294,9 +303,11 @@ const Homepage = () => {
       {/* BUTTON GRID */}
       <div className="button-grid">
         <button className="menu-btn" onClick={handleShowSalary}>
-          💰 Salary Insights
+          腸 Salary Insights
         </button>
-        <ResumeUpload />
+        <button className="menu-btn" onClick={handleShowResumeAnalyzer}>
+            Resume Analyzer
+        </button>
         <button className="menu-btn" onClick={handleShowRoadmap}>
           {roadmapLoading ? "Loading Roadmap..." : "Career Roadmap"}
         </button>
@@ -304,7 +315,7 @@ const Homepage = () => {
           className="menu-btn"
           onClick={() => navigate("/careeradvisor")}
         >
-          Career Explorer
+          Chat With Our AI
         </button>
       </div>
 
@@ -313,7 +324,7 @@ const Homepage = () => {
         <h2>Welcome, {profileData?.personalDetails?.name || "User"}</h2>
         <p>What career suits me if I love design?</p>
         <p>Suggested Careers: UX Designer, Product Designer Cocersza</p>
-        <button className="btn-primary">Try Mock Interview</button>
+        {/* <button className="btn-primary">Try Mock Interview</button> */}
       </div>
 
       {/* Roadmap Modal */}
@@ -362,6 +373,24 @@ const Homepage = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Resume Analyzer Modal */}
+      {showResumeModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-gray-800 text-white shadow-xl rounded-2xl p-6 w-full max-w-md border border-purple-400 relative mx-4">
+            <button
+              onClick={handleCloseResumeAnalyzer}
+              className="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white rounded-lg text-sm"
+            >
+              Close
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-purple-300">
+              Resume Analyzer
+            </h2>
+            <ResumeUpload />
           </div>
         </div>
       )}

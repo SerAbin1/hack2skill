@@ -192,7 +192,7 @@ const CareerAdvisor = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container bg-blue-50">
       <div className="container mx-auto p-4 sm:p-6 lg:p-8">
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="card flex flex-col h-[90vh] max-h-[900px]">
