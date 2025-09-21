@@ -6,8 +6,8 @@ import { auth, db } from "./firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { ReactFlowProvider } from "reactflow"; // ✅ Added
-import RoadmapFlow from "./components/RoadmapFlow"; // ✅ Added
+import { ReactFlowProvider } from "reactflow";
+import RoadmapFlow from "./components/RoadmapFlow";
 
 const Homepage = () => {
   const [user, loading] = useAuthState(auth);
@@ -16,9 +16,13 @@ const Homepage = () => {
   const [profileData, setProfileData] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  const [roadmapData, setRoadmapData] = useState(null); // ✅ Added
-  const [roadmapLoading, setRoadmapLoading] = useState(false); // ✅ Added
-  const [showRoadmapModal, setShowRoadmapModal] = useState(false); // ✅ Added
+  const [roadmapData, setRoadmapData] = useState(null);
+  const [roadmapLoading, setRoadmapLoading] = useState(false);
+  const [showRoadmapModal, setShowRoadmapModal] = useState(false);
+
+  const [showSalaryModal, setShowSalaryModal] = useState(false);
+  const [salaryLoading, setSalaryLoading] = useState(false);
+  const [salaryResult, setSalaryResult] = useState({ insights: "", context: "" });
 
   const navigate = useNavigate();
 
@@ -54,11 +58,9 @@ const Homepage = () => {
   };
 
   const handleSave = () => {
-    // Implement save functionality here if needed
     setIsEditing(false);
   };
 
-  // ✅ Fetch roadmap when button is clicked
   const handleShowRoadmap = async () => {
     setRoadmapLoading(true);
     setRoadmapData(null);
@@ -87,6 +89,55 @@ const Homepage = () => {
     setShowRoadmapModal(false);
   };
 
+  // --- UPDATED Function for Salary Insights ---
+  const handleShowSalary = async () => {
+    const interestedFields = profileData?.interestedFields?.checked || [];
+    const skills = profileData?.skills?.checked || [];
+
+    if (interestedFields.length === 0 && skills.length === 0) {
+      alert(
+        "Please complete your profile with skills or interested fields to get salary insights."
+      );
+      return;
+    }
+
+    const location = "India";
+    const contextForDisplay = [...interestedFields, ...skills].join(", ");
+
+    setShowSalaryModal(true);
+    setSalaryLoading(true);
+    setSalaryResult({ insights: "", context: "" }); // Clear previous results
+
+    try {
+      const res = await fetch("http://localhost:3000/api/salary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // ✅ Send both arrays to the backend
+        body: JSON.stringify({ interestedFields, skills, location }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch salary data from the server.");
+      }
+
+      const data = await res.json();
+      setSalaryResult({ insights: data.insights, context: contextForDisplay });
+    } catch (error) {
+      console.error("Error fetching salary insights:", error);
+      setSalaryResult({
+        insights:
+          "Sorry, I couldn't fetch salary insights right now. Please try again later.",
+        context: contextForDisplay,
+      });
+    } finally {
+      setSalaryLoading(false);
+    }
+  };
+
+  const handleCloseSalary = () => {
+    setShowSalaryModal(false);
+  };
+
   if (loading || profileLoading) {
     return <div>Loading...</div>;
   }
@@ -96,10 +147,7 @@ const Homepage = () => {
       {/* TOP NAV */}
       <div className="top-nav">
         <div className="top-right">
-          
-
           <div className="avatar" onClick={() => setProfileOpen(!profileOpen)}>
-            {/* <img src="/avatar.png" alt="Profile" /> */}
             <span className="icon cursor-pointer">👥</span>
           </div>
         </div>
@@ -172,7 +220,9 @@ const Homepage = () => {
                     onChange={handleChange}
                   />
                 ) : (
-                  <span>{profileData.interestedFields?.checked.join(", ")}</span>
+                  <span>
+                    {profileData.interestedFields?.checked.join(", ")}
+                  </span>
                 )}
               </div>
               <div className="form-box">
@@ -203,18 +253,25 @@ const Homepage = () => {
             </button>
           )}
 
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       )}
 
       {/* BUTTON GRID */}
       <div className="button-grid">
-        <button className="menu-btn">Take Skill Quiz</button>
+        <button className="menu-btn" onClick={handleShowSalary}>
+          💰 Salary Insights
+        </button>
         <ResumeUpload />
         <button className="menu-btn" onClick={handleShowRoadmap}>
           {roadmapLoading ? "Loading Roadmap..." : "Career Roadmap"}
         </button>
-        <button className="menu-btn" onClick={() => navigate("/careeradvisor")}>
+        <button
+          className="menu-btn"
+          onClick={() => navigate("/careeradvisor")}
+        >
           Career Explorer
         </button>
       </div>
@@ -227,13 +284,13 @@ const Homepage = () => {
         <button className="btn-primary">Try Mock Interview</button>
       </div>
 
-      {/* ✅ Roadmap Modal */}
+      {/* Roadmap Modal */}
       {showRoadmapModal && roadmapData && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-90">
-          <div className="bg-white shadow-xl text-black rounded-2xl p-6 w-full max-w-[90vw] border border-gray-200 relative">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-5000">
+          <div className="bg-white shadow-xl text-black rounded-2xl min-h-[100vh] p-6 w-full max-w-[90vw] h-[90vh] border border-gray-200 relative">
             <button
               onClick={handleCloseRoadmap}
-              className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm"
+              className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm z-10"
             >
               Close
             </button>
@@ -241,6 +298,39 @@ const Homepage = () => {
             <ReactFlowProvider>
               <RoadmapFlow roadmapData={roadmapData} />
             </ReactFlowProvider>
+          </div>
+        </div>
+      )}
+
+      {/* --- UPDATED Salary Insights Modal --- */}
+      {showSalaryModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-gray-800 text-white shadow-xl rounded-2xl p-6 w-full max-w-md border border-purple-400 relative mx-4">
+            <button
+              onClick={handleCloseSalary}
+              className="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white rounded-lg text-sm"
+            >
+              Close
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-purple-300">
+              Salary Insights
+            </h2>
+            {salaryLoading ? (
+              <p>Fetching insights for you...</p>
+            ) : (
+              <div>
+                {/* ✅ Display the context used for the query */}
+                <p className="text-lg font-semibold mb-2">
+                  Based on:{" "}
+                  <span className="capitalize font-normal text-purple-300">
+                    {salaryResult.context}
+                  </span>
+                </p>
+                <div className="mt-4 bg-gray-900 p-4 rounded-lg whitespace-pre-wrap">
+                  <p className="text-gray-300">{salaryResult.insights}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
