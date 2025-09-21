@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
 
@@ -10,6 +9,11 @@ const ResumeUpload = () => {
     const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const fileInputRef = useRef(null);
+
+    const handleButtonClick = () => {
+        fileInputRef.current.click();
+    };
 
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
@@ -74,7 +78,14 @@ const ResumeUpload = () => {
 
     return (
         <div>
-            <input type="file" onChange={handleFileChange} accept=".pdf,.docx" />
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              accept=".pdf,.docx" 
+              style={{ display: 'none' }} 
+            />
+            <button onClick={handleButtonClick} className="menu-btn">Browse</button>
             {loading && <p>Processing...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {skills.length > 0 && (
